@@ -1,7 +1,25 @@
 // require necessary NPM packages
 const express = require('express')
 const mongoose = require('mongoose')
-const cors = require('cors')
+
+
+// define server and client ports
+// used for cors and local port declaration
+const serverDevPort = 4741
+const clientDevPort = 7165
+
+// define port for API to run on
+const port = process.env.PORT || serverDevPort
+
+const app = express()
+
+// const cors = require('cors')
+
+// run API on designated port (4741 in this case)
+const server = app.listen(port, () => {
+  console.log('listening on port ' + port)
+})
+const io = require('socket.io')(server, { cors: { origin: '*' }})
 
 // require route files
 const exampleRoutes = require('./app/routes/example_routes')
@@ -18,11 +36,6 @@ const db = require('./config/db')
 // require configured passport authentication middleware
 const auth = require('./lib/auth')
 
-// define server and client ports
-// used for cors and local port declaration
-const serverDevPort = 4741
-const clientDevPort = 7165
-
 // establish database connection
 // use new version of URL parser
 // use createIndex instead of deprecated ensureIndex
@@ -33,17 +46,23 @@ mongoose.connect(db, {
 })
 
 // instantiate express application object
-const app = express()
+
 
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
+// app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
-// define port for API to run on
-const port = process.env.PORT || serverDevPort
+io.on('connection', (socket) => {
+  console.log("User connected: " + socket.id)
+  socket.on('message', (data) => {
+    console.log(data)
+    socket.broadcast.emit('message', data)
+  })
+})
 
 // register passport authentication middleware
 app.use(auth)
+
 
 // add `express.json` middleware which will parse JSON requests into
 // JS objects before they reach the route files.
@@ -64,9 +83,8 @@ app.use(userRoutes)
 // passed any error messages from them
 app.use(errorHandler)
 
-// run API on designated port (4741 in this case)
-app.listen(port, () => {
-  console.log('listening on port ' + port)
+app.get('/', (req, res) => {
+  res.send(200)
 })
 
 // needed for testing
