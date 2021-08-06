@@ -1,21 +1,14 @@
 const mongoose = require('mongoose')
+const User = require('./user')
 
-const exampleSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  text: {
-    type: String,
-    required: true
-  },
-  owner: {
+const playerSchema = new mongoose.Schema({
+  player: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  }          
 }, {
   timestamps: true
 })
 
-module.exports = mongoose.model('Example', exampleSchema)
+module.exports = playerSchema

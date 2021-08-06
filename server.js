@@ -22,7 +22,7 @@ const server = app.listen(port, () => {
 const io = require('socket.io')(server, { cors: { origin: '*' } })
 
 // require route files
-const exampleRoutes = require('./app/routes/example_routes')
+const gameRoutes = require('./app/routes/game_routes')
 const userRoutes = require('./app/routes/user_routes')
 
 // require middleware
@@ -58,14 +58,23 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('new-user')
   })
 
+  socket.on('start-game', (gameBoard) => {
+    socket.broadcast.emit('start-game', gameBoard)
+  })
+
   socket.on('message', (data) => {
     console.log(data)
     socket.broadcast.emit('message', data)
   })
   
-  socket.on('board', (board) => {
+  socket.on('click', (click) => {
     console.log(`Board updated by: ${socket.id}`)
-    socket.broadcast.emit('board', board)
+    socket.broadcast.emit('click', click)
+  })
+
+  socket.on('settlement', (settlements) => {
+    console.log(settlements)
+    socket.broadcast.emit('settlement', settlements)
   })
 })
 
@@ -83,7 +92,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
-app.use(exampleRoutes)
+app.use(gameRoutes)
 app.use(userRoutes)
 
 // register error handling middleware
