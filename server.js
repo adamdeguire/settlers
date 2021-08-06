@@ -1,7 +1,7 @@
 // require necessary NPM packages
 const express = require('express')
 const mongoose = require('mongoose')
-
+const cors = require('cors')
 
 // define server and client ports
 // used for cors and local port declaration
@@ -13,13 +13,13 @@ const port = process.env.PORT || serverDevPort
 
 const app = express()
 
-// const cors = require('cors')
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
 // run API on designated port (4741 in this case)
 const server = app.listen(port, () => {
   console.log('listening on port ' + port)
 })
-const io = require('socket.io')(server, { cors: { origin: '*' }})
+const io = require('socket.io')(server, { cors: { origin: '*' } })
 
 // require route files
 const exampleRoutes = require('./app/routes/example_routes')
@@ -47,22 +47,30 @@ mongoose.connect(db, {
 
 // instantiate express application object
 
-
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
 // app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
 io.on('connection', (socket) => {
-  console.log("User connected: " + socket.id)
+  console.log('User connected: ' + socket.id)
+
+  socket.on('new-user', () => {
+    socket.broadcast.emit('new-user')
+  })
+
   socket.on('message', (data) => {
     console.log(data)
     socket.broadcast.emit('message', data)
+  })
+  
+  socket.on('board', (board) => {
+    console.log(`Board updated by: ${socket.id}`)
+    socket.broadcast.emit('board', board)
   })
 })
 
 // register passport authentication middleware
 app.use(auth)
-
 
 // add `express.json` middleware which will parse JSON requests into
 // JS objects before they reach the route files.
@@ -83,9 +91,9 @@ app.use(userRoutes)
 // passed any error messages from them
 app.use(errorHandler)
 
-app.get('/', (req, res) => {
-  res.send(200)
-})
+// app.get('/', (req, res) => {
+//   res.send(200)
+// })
 
 // needed for testing
 module.exports = app
