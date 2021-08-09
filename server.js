@@ -76,6 +76,21 @@ io.on('connection', (socket) => {
     console.log(settlements)
     socket.broadcast.emit('settlement', settlements)
   })
+
+  socket.on('road', (roads) => {
+    console.log(roads)
+    socket.broadcast.emit('road', roads)
+  })
+
+  socket.on('hide-color', (color) => {
+    console.log(color)
+    socket.broadcast.emit('hide-color', color)
+  })
+
+  socket.on('dice-roll', (roll1, roll2) => {
+    console.log(roll1, roll2)
+    socket.broadcast.emit('dice-roll', roll1, roll2)
+  })
 })
 
 // register passport authentication middleware
