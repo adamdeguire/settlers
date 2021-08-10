@@ -68,7 +68,7 @@ router.post('/sign-in', (req, res, next) => {
     .catch(next)
 })
 
-// CHANGE password
+// CHANGE PASSWORD
 // PATCH /change-password
 router.patch('/change-password', requireToken, (req, res, next) => {
   let user
@@ -89,6 +89,8 @@ router.patch('/change-password', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+// SIGN OUT
+// DELETE /sign-out
 router.delete('/sign-out', requireToken, (req, res, next) => {
   req.user.token = null
   req.user.save()

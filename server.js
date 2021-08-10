@@ -52,43 +52,36 @@ mongoose.connect(db, {
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
 io.on('connection', (socket) => {
-  console.log('User connected: ' + socket.id)
 
-  socket.on('new-user', () => {
-    socket.broadcast.emit('new-user')
+  socket.on('add-player', (playerId) => {
+    socket.broadcast.emit('add-player', playerId)
   })
 
-  socket.on('start-game', (gameBoard) => {
-    socket.broadcast.emit('start-game', gameBoard)
+  socket.on('start-game', (gameBoard, res) => {
+    socket.broadcast.emit('start-game', gameBoard, res)
   })
 
   socket.on('message', (data) => {
-    console.log(data)
     socket.broadcast.emit('message', data)
   })
   
   socket.on('click', (click) => {
-    console.log(`Board updated by: ${socket.id}`)
     socket.broadcast.emit('click', click)
   })
 
   socket.on('settlement', (settlements) => {
-    console.log(settlements)
     socket.broadcast.emit('settlement', settlements)
   })
 
   socket.on('road', (roads) => {
-    console.log(roads)
     socket.broadcast.emit('road', roads)
   })
 
   socket.on('hide-color', (color) => {
-    console.log(color)
     socket.broadcast.emit('hide-color', color)
   })
 
   socket.on('dice-roll', (roll1, roll2) => {
-    console.log(roll1, roll2)
     socket.broadcast.emit('dice-roll', roll1, roll2)
   })
 })

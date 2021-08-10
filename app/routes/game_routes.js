@@ -56,7 +56,6 @@ router.patch('/games/:id', requireToken, removeBlanks, (req, res, next) => {
   Game.findById(req.params.id)
     .then(handle404)
     .then(game => {
-      requireOwnership(req, game)
       return game.updateOne(req.body.game)
     })
     .then(() => res.sendStatus(204))

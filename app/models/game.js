@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const playerSchema = require('./player')
 
 const gameSchema = new mongoose.Schema({
   owner: {
@@ -7,7 +6,7 @@ const gameSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },          
-  players: [playerSchema],
+  players: [],
   board: String,
   settlements: String,
   roads: String
