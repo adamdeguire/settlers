@@ -5,9 +5,16 @@ const gameSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  },          
-  players: [],
-  board: String,
+  },
+  players: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',
+    required: true
+  },
+  board: {
+    type: String,
+    required: true
+  },
   settlements: String,
   roads: String
 }, {

@@ -22,6 +22,7 @@ const server = app.listen(port, () => {
 const io = require('socket.io')(server, { cors: { origin: '*' } })
 
 // require route files
+const lobbyRoutes = require('./app/routes/lobby_routes')
 const gameRoutes = require('./app/routes/game_routes')
 const userRoutes = require('./app/routes/user_routes')
 
@@ -53,20 +54,20 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDe
 
 io.on('connection', (socket) => {
 
-  socket.on('add-player', (playerId) => {
-    socket.broadcast.emit('add-player', playerId)
+  socket.on('update-players', (res) => {
+    socket.broadcast.emit('update-players', res)
   })
 
   socket.on('start-game', (gameBoard, res) => {
     socket.broadcast.emit('start-game', gameBoard, res)
   })
 
+  socket.on('next-turn', (nextPlayer) => {
+    socket.broadcast.emit('next-turn', nextPlayer)
+  })
+
   socket.on('message', (data) => {
     socket.broadcast.emit('message', data)
-  })
-  
-  socket.on('click', (click) => {
-    socket.broadcast.emit('click', click)
   })
 
   socket.on('settlement', (settlements) => {
@@ -84,6 +85,10 @@ io.on('connection', (socket) => {
   socket.on('dice-roll', (roll1, roll2) => {
     socket.broadcast.emit('dice-roll', roll1, roll2)
   })
+
+  socket.on('host-quit', () => {
+    socket.broadcast.emit('host-quit')
+  })
 })
 
 // register passport authentication middleware
@@ -100,6 +105,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
+app.use(lobbyRoutes)
 app.use(gameRoutes)
 app.use(userRoutes)
 
