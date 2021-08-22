@@ -44,7 +44,6 @@ router.get('/lobby', requireToken, (req, res, next) => {
     Lobby.findById(req.params.id)
       .then(handle404)
       .then(lobby => {
-          console.log(req.body.player)
         lobby.players.push(req.body.player)
         return lobby.save()
       })

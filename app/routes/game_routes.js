@@ -51,12 +51,12 @@ router.post('/games', requireToken, (req, res, next) => {
 // UPDATE
 // PATCH /games/5a7db6c74d55bc51bdf39793
 router.patch('/games/:id', requireToken, removeBlanks, (req, res, next) => {
-  delete req.body.game.owner
 
   Game.findById(req.params.id)
     .then(handle404)
     .then(game => {
-      return game.updateOne(req.body.game)
+      requireOwnership(req, game)
+      game.updateOne(req.body.game)
     })
     .then(() => res.sendStatus(204))
     .catch(next)
